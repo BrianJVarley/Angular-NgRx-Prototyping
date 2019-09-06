@@ -24,6 +24,12 @@ const initialState: ProductState = {
  */
 const getProductFeatureState = createFeatureSelector<ProductState>('products');
 
+export const getCurrentProductId = createSelector(
+	getProductFeatureState,
+	state => state.currentProduct.id
+)
+
+
 export const getShowProductCode = createSelector(
 	getProductFeatureState,
 	state => state.showProductCode
@@ -31,7 +37,9 @@ export const getShowProductCode = createSelector(
 
 export const getCurrentProduct = createSelector(
 	getProductFeatureState,
-	state => state.currentProduct
+	getCurrentProductId,
+	(state, id) => 
+	state.products.find(product => product.id === id)
 )
 
 export const getProducts = createSelector(
