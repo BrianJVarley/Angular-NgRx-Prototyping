@@ -1,8 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Subscription } from 'rxjs';
-
 import { Product } from '../product';
 import { ProductService } from '../product.service';
 import { GenericValidator } from '../../shared/generic-validator';
@@ -30,7 +28,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   private validationMessages: { [key: string]: { [key: string]: string } };
   private genericValidator: GenericValidator;
 
-  constructor(private store: Store<fromProduct.State>,private fb: FormBuilder,
+  constructor(private store: Store<fromProduct.State>,
+              private fb: FormBuilder,
               private productService: ProductService) {
 
     // Defines all of the validation messages for the form.
@@ -66,8 +65,8 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     });
 
     // Watch for changes to the currently selected product
-    // TODO: handle unsubscribe
-    this.store.pipe(select(fromProduct.getCurrentProduct )).subscribe(
+    // TODO: Unsubscribe
+    this.store.pipe(select(fromProduct.getCurrentProduct)).subscribe(
       currentProduct => this.displayProduct(currentProduct)
     );
 
@@ -78,6 +77,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+
   }
 
   // Also validate on blur
@@ -127,7 +127,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
       }
     } else {
       // No need to delete, it was never saved
-      this.store.dispatch(new productActions.ClearCurrentProduct())    
+      this.store.dispatch(new productActions.ClearCurrentProduct());
     }
   }
 

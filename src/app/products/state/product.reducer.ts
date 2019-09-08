@@ -1,93 +1,82 @@
 import { Product } from '../product';
-import * as fromRoot from '../../state/app.state';
+
+/* NgRx */
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { ProductActions, ProductActionTypes } from './product.actions';
+import * as fromRoot from '../../state/app.state';
 
-// extend Root State to assign lazy loaded
-// ProductState when component loaded
+// Extends the app state to include the product feature.
+// This is required because products are lazy loaded.
+// So the reference to ProductState cannot be added to app.state.ts directly.
 export interface State extends fromRoot.State {
-	products: ProductState;
+  products: ProductState;
 }
+
+// State for this feature (Product)
 export interface ProductState {
-	showProductCode: boolean;
-	currentProduct: Product;
-	products: Product[];
-};
+  showProductCode: boolean;
+  currentProduct: Product;
+  products: Product[];
+}
 
 const initialState: ProductState = {
-	showProductCode: true,
-	currentProduct: null,
-	products: [],
-}
+  showProductCode: true,
+  currentProduct: null,
+  products: []
+};
 
-/**
- * State Selectors
- */
+// Selector functions
 const getProductFeatureState = createFeatureSelector<ProductState>('products');
 
-export const getCurrentProductId = createSelector(
-	getProductFeatureState,
-	state => state.currentProduct.id
-)
-
-
 export const getShowProductCode = createSelector(
-	getProductFeatureState,
-	state => state.showProductCode
-)
+  getProductFeatureState,
+  state => state.showProductCode
+);
 
 export const getCurrentProduct = createSelector(
-	getProductFeatureState,
-	getCurrentProductId,
-	(state, id) => 
-	state.products.find(product => product.id === id)
-)
+  getProductFeatureState,
+  state => state.currentProduct
+);
 
 export const getProducts = createSelector(
-	getProductFeatureState,
-	state => state.products
-)
+  getProductFeatureState,
+  state => state.products
+);
 
-/**
- * Reducer
- * @param state 
- * @param action 
- */
 export function reducer(state = initialState, action: ProductActions): ProductState {
 
-	switch (action.type) {
-	  case ProductActionTypes.ToggleProductCode:
-		return {
-		  ...state,
-		  showProductCode: action.payload
-		};
-  
-	  case ProductActionTypes.SetCurrentProduct:
-		return {
-		  ...state,
-		  currentProduct: { ...action.payload }
-		};
-  
-	  case ProductActionTypes.ClearCurrentProduct:
-		return {
-		  ...state,
-		  currentProduct: null
-		};
-  
-	  case ProductActionTypes.InitializeCurrentProduct:
-		return {
-		  ...state,
-		  currentProduct: {
-			id: 0,
-			productName: '',
-			productCode: 'New',
-			description: '',
-			starRating: 0
-		  }
-		};
-  
-	  default:
-		return state;
-	}
-  }
+  switch (action.type) {
+    case ProductActionTypes.ToggleProductCode:
+      return {
+        ...state,
+        showProductCode: action.payload
+      };
 
+    case ProductActionTypes.SetCurrentProduct:
+      return {
+        ...state,
+        currentProduct: { ...action.payload }
+      };
+
+    case ProductActionTypes.ClearCurrentProduct:
+      return {
+        ...state,
+        currentProduct: null
+      };
+
+    case ProductActionTypes.InitializeCurrentProduct:
+      return {
+        ...state,
+        currentProduct: {
+          id: 0,
+          productName: '',
+          productCode: 'New',
+          description: '',
+          starRating: 0
+        }
+      };
+
+    default:
+      return state;
+  }
+}
