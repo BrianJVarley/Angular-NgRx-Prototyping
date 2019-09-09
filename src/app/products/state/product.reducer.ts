@@ -17,12 +17,14 @@ export interface ProductState {
   showProductCode: boolean;
   currentProduct: Product;
   products: Product[];
+  error: string;
 }
 
 const initialState: ProductState = {
   showProductCode: true,
   currentProduct: null,
-  products: []
+  products: [],
+  error: ''
 };
 
 // Selector functions
@@ -41,6 +43,11 @@ export const getCurrentProduct = createSelector(
 export const getProducts = createSelector(
   getProductFeatureState,
   state => state.products
+);
+
+export const getError = createSelector(
+  getProductFeatureState,
+  state => state.error
 );
 
 export function reducer(state = initialState, action: ProductActions): ProductState {
@@ -78,7 +85,15 @@ export function reducer(state = initialState, action: ProductActions): ProductSt
     case ProductActionTypes.LoadSuccess:
       return {
         ...state,
-        products: action.payload
+        products: action.payload,
+        error: ''
+      }
+
+    case ProductActionTypes.LoadFail:
+      return {
+        ...state,
+        products: [],
+        error: action.payload
       }
 
     default:

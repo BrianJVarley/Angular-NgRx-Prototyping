@@ -8,7 +8,6 @@ import { Store, select } from '@ngrx/store';
 import * as fromProduct from '../state/product.reducer';
 import * as productActions from '../state/product.actions';
 import { takeWhile } from 'rxjs/operators';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -28,6 +27,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   componentActive = true;
   products$: Observable<Product[]>;
+  errorMessage$: Observable<string>;
 
 
   constructor(private store: Store<fromProduct.State>,
@@ -42,7 +42,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.store.dispatch(new productActions.Load());
 
     this.products$ = this.store.pipe(select(fromProduct.getProducts));
-
+    this.errorMessage$ =  this.store.pipe(select(fromProduct.getError));
     // NOTE: Use this approach to unsubscribe observable
     // using local vairable instead of async | pipe 
     // this.store.pipe(select(fromProduct.getProducts),
