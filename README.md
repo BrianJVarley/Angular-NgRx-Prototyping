@@ -109,7 +109,11 @@ this.store.dispatch(new productActions.ToggleProductCode(value));
 
 ```
 
-> Using @Effects:
+> Using @ngrx/effects:
+
+The NgRx effects decorator handles side effects from a service. For example a service that makes async HTTP request. This really helps to keep components _pure_ and decrease the responsibility of a component. 
+
+The `@ngrx/effects` are similar to `redux-saga` library commonly used in React applications to handle side effects.
 
 ```javascript
 
