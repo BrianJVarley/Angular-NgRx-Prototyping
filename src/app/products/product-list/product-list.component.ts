@@ -7,6 +7,9 @@ import { ProductService } from '../product.service';
 import { Store, select } from '@ngrx/store';
 import * as fromProduct from '../state/product.reducer';
 import * as productActions from '../state/product.actions';
+import { takeWhile } from 'rxjs/operators';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'pm-product-list',
@@ -14,15 +17,18 @@ import * as productActions from '../state/product.actions';
   styleUrls: ['./product-list.component.css']
 })
 export class ProductListComponent implements OnInit, OnDestroy {
+  
   pageTitle = 'Products';
   errorMessage: string;
-
   displayCode: boolean;
-
   products: Product[];
 
   // Used to highlight the selected product in the list
   selectedProduct: Product | null;
+
+  componentActive = true;
+  products$: Observable<Product[]>;
+
 
   constructor(private store: Store<fromProduct.State>,
               private productService: ProductService) { }
@@ -33,15 +39,16 @@ export class ProductListComponent implements OnInit, OnDestroy {
       currentProduct => this.selectedProduct = currentProduct
     );
 
-
     this.store.dispatch(new productActions.Load());
-    this.store.pipe(select(fromProduct.getProducts)).subscribe((products: Product[]) => this.products = products);
 
-    // this.productService.getProducts().subscribe({
-    //   next: (products: Product[]) => this.products = products,
-    //   error: err => this.errorMessage = err.error
-    // });
-    
+    this.products$ = this.store.pipe(select(fromProduct.getProducts));
+
+    // NOTE: Use this approach to unsubscribe observable
+    // using local vairable instead of async | pipe 
+    // this.store.pipe(select(fromProduct.getProducts),
+    // takeWhile(() => this.componentActive))
+    // .subscribe((products: Product[]) => this.products = products);
+
     // TODO: Unsubscribe
     this.store.pipe(select(fromProduct.getShowProductCode)).subscribe(
       showProductCode => this.displayCode = showProductCode
@@ -49,7 +56,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-
+    // this.componentActive = false;
   }
 
   checkChanged(value: boolean): void {
