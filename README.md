@@ -1,17 +1,143 @@
 # Angular-ngrx-GettingStarted
-Materials for NgRx course.
+Forked from [Angular & NgRx course](https://github.com/DeborahK/Angular-NgRx-GettingStarted)
 
-`APM-Demo0`: The starter files for this course. **Use this to code along with the course**.
+Some examples of using @ngrx in Angular and how to strongly type the state, reducer, actions within an application
 
-`APM-Demo1`: Completed files after the *First Look at NgRx* module. It demonstrates a very simple NgRx example.
+> Strongly Typing Stuff:
 
-`APM-Demo2`: Completed files after the *Strongly Typing Actions with Action Creators* module. It refactors the simple example to include developer tooling support and strong typing.
+Pretty much assign a type to your state and actions to enforce typing..See [usage-with-typescript](https://redux.js.org/recipes/usage-with-typescript)
 
-`APM-Demo3`: Completed files after the *Working with Effects* module. It adds an effect to retrieve data via http. NOTE: Once we move the data retrieval to actions and the store, the create, update, and delete operations no longer work. These features are implemented with the store in the next demo.
+```javascript
+import { Product } from '../product';
 
-`APM-Demo4`: Completed files after the *Performing Update Operations* module. It adds the code needed for create, update, and delete operations via http.
+/* NgRx */
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { ProductActions, ProductActionTypes } from './product.actions';
+import * as fromRoot from '../../state/app.state';
 
-`APM-Demo5`: Completed files after the *Architectural Considerations* module. It implements the container/presentational component pattern and the OnPush change detection strategy.
+// Extends the app state to include the product feature.
+// This is required because products are lazy loaded.
+// So the reference to ProductState cannot be added to app.state.ts directly.
+export interface State extends fromRoot.State {
+  products: ProductState;
+}
 
-NOTE: 
-- September 2, 2019: This code was modified to Angular version 8 (v8). See the CHANGELOG.md file for details.
+// State for this feature (Product)
+export interface ProductState {
+  showProductCode: boolean;
+  currentProduct: Product;
+  products: Product[];
+}
+
+const initialState: ProductState = {
+  showProductCode: true,
+  currentProduct: null,
+  products: []
+};
+
+export function reducer(state = initialState, action: ProductActions): ProductState {
+
+  switch (action.type) {
+    case ProductActionTypes.ToggleProductCode:
+      return {
+        ...state,
+        showProductCode: action.payload
+      };
+
+    default:
+      return state;
+  }
+}
+
+```
+
+> Creating Actions:
+
+Define an `enum` to type the actions available for your state. This gives good feedback when
+dispatching actions so that you supply the correct payload types and  call the correct actions.
+
+Each action implements a standard type from `@ngrx/store` called an `Action` which enforces
+the type checking on the actions. At the end of the actions file we export the actions as a _union_ `export type ProductActions = ToggleProductCode | SetCurrentProduct;` so that the action types show in intellisense on the editor.
+
+```javascript
+import { Product } from '../product';
+
+/* NgRx */
+import { Action } from '@ngrx/store';
+
+export enum ProductActionTypes {
+  ToggleProductCode = '[Product] Toggle Product Code',
+  SetCurrentProduct = '[Product] Set Current Product'
+}
+
+// Action Creators
+export class ToggleProductCode implements Action {
+  readonly type = ProductActionTypes.ToggleProductCode;
+
+  constructor(public payload: boolean) { }
+}
+
+export class SetCurrentProduct implements Action {
+  readonly type = ProductActionTypes.SetCurrentProduct;
+
+  constructor(public payload: Product) { }
+}
+
+export type ProductActions = ToggleProductCode
+  | SetCurrentProduct;
+
+
+```
+
+
+> Dispatching Actions:
+
+The actions are dispatched via the store and created from the exported _actions_ object. 
+Since we typed the actions we get type checking on the action payload and actions types.
+
+```javascript
+
+/* NgRx */
+import { Store, select } from '@ngrx/store';
+import * as fromProduct from '../state/product.reducer';
+import * as productActions from '../state/product.actions';
+
+....
+
+this.store.dispatch(new productActions.ToggleProductCode(value));
+
+
+```
+
+> Using @Effects:
+
+```javascript
+
+
+
+```
+
+> Defining State `Selectors`:
+
+Selectors are pure functions used for obtaining slices of store state. @ngrx/store provides a few helper functions for optimizing this selection. Selectors provide many features when selecting slices of state. 
+
+- Portable
+- _Memoization_
+- Composition
+- Testable
+- Type-safe
+
+```javascript
+// Selector functions
+const getProductFeatureState = createFeatureSelector<ProductState>('products');
+
+export const getShowProductCode = createSelector(
+  getProductFeatureState,
+  state => state.showProductCode
+);
+
+```
+
+> Debugging with Redux Dev Tools:
+> Install the Chrome [Devtools extension](https://ngrx.io/guide/store-devtools)
+> F12 in browser and open `Redux` tab, where you can view sequence of each action dispatched and the state tree changes.
