@@ -115,9 +115,41 @@ The NgRx effects decorator handles side effects from a service. For example a se
 
 The `@ngrx/effects` are similar to `redux-saga` library commonly used in React applications to handle side effects.
 
+This example `ProductEffects` class demonstrates listening for the `loadProducts`
+action and dispatches a side effect action `LoadSuccess` or `LoadFail` depending on the result of the `loadProducts` action.
+
 ```javascript
 
+import { Injectable } from '@angular/core';
 
+import { Observable, of } from 'rxjs';
+import { mergeMap, map, catchError } from 'rxjs/operators';
+
+import { ProductService } from '../product.service';
+
+/* NgRx */
+import { Action } from '@ngrx/store';
+import { Actions, Effect, ofType } from '@ngrx/effects';
+import * as productActions from './product.actions';
+
+@Injectable()
+export class ProductEffects {
+
+  constructor(private productService: ProductService,
+              private actions$: Actions) { }
+
+  @Effect()
+  loadProducts$: Observable<Action> = this.actions$.pipe(
+    ofType(productActions.ProductActionTypes.Load),
+    mergeMap(action =>
+      this.productService.getProducts().pipe(
+        map(products => (new productActions.LoadSuccess(products))),
+        catchError(err => of(new productActions.LoadFail(err)))
+      )
+    )
+  );
+
+}
 
 ```
 
