@@ -1,7 +1,7 @@
-import { Product } from '../product';
+import { Product } from '../product'
 
 /* NgRx */
-import { Action } from '@ngrx/store';
+import { Action } from '@ngrx/store'
 
 export enum ProductActionTypes {
   ToggleProductCode = '[Product] Toggle Product Code',
@@ -10,50 +10,53 @@ export enum ProductActionTypes {
   InitializeCurrentProduct = '[Product] Initialize Current Product',
   Load = '[Product] Load',
   LoadSuccess = '[Product] Load Success',
-  LoadFail = '[Product] Load Fail'
+  LoadFail = '[Product] Load Fail',
 }
 
 // Action Creators
 export class ToggleProductCode implements Action {
-  readonly type = ProductActionTypes.ToggleProductCode;
+  readonly type = ProductActionTypes.ToggleProductCode
 
-  constructor(public payload: boolean) { }
+  constructor(public payload: boolean) {}
 }
 
 export class SetCurrentProduct implements Action {
-  readonly type = ProductActionTypes.SetCurrentProduct;
+  readonly type = ProductActionTypes.SetCurrentProduct
 
-  constructor(public payload: Product) { }
+  constructor(public payload: Product) {}
 }
 
 export class ClearCurrentProduct implements Action {
-  readonly type = ProductActionTypes.ClearCurrentProduct;
+  readonly type = ProductActionTypes.ClearCurrentProduct
+
+  constructor(public payload?: Product['id']) {}
 }
 
 export class InitializeCurrentProduct implements Action {
-  readonly type = ProductActionTypes.InitializeCurrentProduct;
+  readonly type = ProductActionTypes.InitializeCurrentProduct
 }
 
 export class Load implements Action {
-  readonly type = ProductActionTypes.Load;
+  readonly type = ProductActionTypes.Load
 }
 
 export class LoadSuccess implements Action {
-  readonly type = ProductActionTypes.LoadSuccess;
+  readonly type = ProductActionTypes.LoadSuccess
 
-  constructor(public payload: Product[]) { }
+  constructor(public payload: Product[]) {}
 }
 
 export class LoadFail implements Action {
-  readonly type = ProductActionTypes.LoadFail;
+  readonly type = ProductActionTypes.LoadFail
 
-  constructor(public payload: string) { }
+  constructor(public payload: string) {}
 }
 
-export type ProductActions = ToggleProductCode
+export type ProductActions =
+  | ToggleProductCode
   | SetCurrentProduct
   | ClearCurrentProduct
   | InitializeCurrentProduct
   | Load
   | LoadSuccess
-  | LoadFail;
+  | LoadFail
